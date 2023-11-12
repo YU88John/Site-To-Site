@@ -23,10 +23,77 @@ Repeat the same steps for `ROUTER-2`.
 CGW is for on-premises routing. To route the incoming network from on-premises to AWS VPCs, we need to create Transit Gateway(TGW) attachments. <br>
 In the VPC console: <br>
 `Transit Gateway Attachments > Create` <br>
-TGW ID: `A4LTGW` <br>
-Attachment: `VPN` <br>
+- TGW ID: `A4LTGW` <br>
+- Attachment: `VPN` <br>
 Choose your existing customer gateway(`ROUTER-1`), `Dynamic(Requires BGP)` routing, Enable acceleration <br>
 Repeat the same steps for `ROUTER-2`
+
+### Download CGW Configurations 
+`VPC > Site-to-Site VPN connections` <br>
+There will be two connections: one for `ROUTER-1` and one for `ROUTER-2` with their respective public IPs. <br>
+Click `Download Configuration` and specify the following. <br>
+- Vendor: `Generic` <br>
+Make sure you name both files accordingly with the routers public IPs (e.g. `Router1config.txt`). <br>
+
+Now it's time to note down the respective values. In this repository, there's a file named `ConfigTemplate.md`, download it. <br>
+In each configuration file that you download earlier, find the respective values and note it down in `ConfigTemplate.md`. The instructions for replacement is already written by Adrian in that template. 
+
+### Configure IPSec tunnels for on-premises routers 
+Go to EC2 console: <br>
+For each instance (`ONPREM-ROUTER1, ONPREM-ROUTER2`), go into `Connect > Session Manager` and type the following commands: <br>
+- `sudo bash`
+- `cd /home/ubuntu/demo-assets`
+- `vim ipsec.conf` <br> 
+We are going to configure two IPSec tunnels for each CGW connections. You will see the placeholders the same as in `ConfigTemplate.md`. Replace the following placeholders: 
+- `ROUTER1_PRIVATE_IP`
+- `CONN1_TUNNEL1_ONPREM_OUTSIDE_IP`
+- `CONN1_TUNNEL1_AWS_OUTSIDE_IP`
+- `CONN1_TUNNEL1_AWS_OUTSIDE_IP` 
+- `ROUTER1_PRIVATE_IP`
+- `CONN1_TUNNEL2_ONPREM_OUTSIDE_IP`
+- `CONN1_TUNNEL2_AWS_OUTSIDE_IP`
+- `CONN1_TUNNEL2_AWS_OUTSIDE_IP` <br>
+Press `Esc` and type `:wq`. Hit `Enter`. <br>
+
+Now, we are going to configure authentication for the tunnels. <br>
+- `vim ipsec.secrets`
+As before, replace the following placeholders: <br>
+- `CONN1_TUNNEL1_ONPREM_OUTSIDE_IP`
+- `CONN1_TUNNEL1_AWS_OUTSIDE_IP`
+- `CONN1_TUNNEL1_PresharedKey`
+- `CONN1_TUNNEL2_ONPREM_OUTSIDE_IP`
+- `CONN1_TUNNEL2_AWS_OUTSIDE_IP`
+- `CONN1_TUNNEL2_PresharedKey`
+Press `Esc` and type `:wq`. Hit `Enter`. <br>
+
+Now, we are going to configure the bash script for IPSec tunnel interfaces. <br>
+- `vim ipsec-vti.sh`
+As before, replace the following placeholders: <br>
+- `CONN1_TUNNEL1_ONPREM_INSIDE_IP (ensuring the /30 is at the end)`
+- `CONN1_TUNNEL1_AWS_INSIDE_IP (ensuring the /30 is at the end)`
+- `CONN1_TUNNEL2_ONPREM_INSIDE_IP (ensuring the /30 is at the end)`
+- `CONN1_TUNNEL2_AWS_INSIDE_IP (ensuring the /30 is at the end)`
+Press `Esc` and type `:wq`. Hit `Enter`. <br>
+
+We have to copy these IPSec configuration files into `/etc` directory where other configurations files are located. <br>
+`cp ipsec* /etc` <br>
+Make the bash script executable `chmod +x /etc/ipsec-vti.sh` <br>
+
+To bring the newly added configurations up, we need to restart our router service, which is `strongswan` in this project <br>
+`systemctl restart strongswan` 
+
+Wait for a minute or two and ensure the IPSec tunnels are up and running <br>
+`ifconfig` <br>
+You will see two new interfaces are configured: `vti1` and `vti2`. 
+
+
+
+
+
+
+
+
+
 
 
 
