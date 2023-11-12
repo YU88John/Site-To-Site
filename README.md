@@ -63,7 +63,7 @@ As before, replace the following placeholders: <br>
 - `CONN1_TUNNEL1_PresharedKey`
 - `CONN1_TUNNEL2_ONPREM_OUTSIDE_IP`
 - `CONN1_TUNNEL2_AWS_OUTSIDE_IP`
-- `CONN1_TUNNEL2_PresharedKey`
+- `CONN1_TUNNEL2_PresharedKey` <br>
 Press `Esc` and type `:wq`. Hit `Enter`. <br>
 
 Now, we are going to configure the bash script for IPSec tunnel interfaces. <br>
@@ -72,7 +72,7 @@ As before, replace the following placeholders: <br>
 - `CONN1_TUNNEL1_ONPREM_INSIDE_IP (ensuring the /30 is at the end)`
 - `CONN1_TUNNEL1_AWS_INSIDE_IP (ensuring the /30 is at the end)`
 - `CONN1_TUNNEL2_ONPREM_INSIDE_IP (ensuring the /30 is at the end)`
-- `CONN1_TUNNEL2_AWS_INSIDE_IP (ensuring the /30 is at the end)`
+- `CONN1_TUNNEL2_AWS_INSIDE_IP (ensuring the /30 is at the end)` <br>
 Press `Esc` and type `:wq`. Hit `Enter`. <br>
 
 We have to copy these IPSec configuration files into `/etc` directory where other configurations files are located. <br>
